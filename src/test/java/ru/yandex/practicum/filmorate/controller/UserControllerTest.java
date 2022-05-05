@@ -139,7 +139,8 @@ public class UserControllerTest {
     void createUnnamedUserResponseShouldBeOkAndRenamedUserAsLogin_thenStatus200() throws Exception {
         User user = getUser();
         String body = mapper.writeValueAsString(user);
-        this.mockMvc.perform(post("/users").content(body).contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/users").content(body)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("login"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Name Surname"));

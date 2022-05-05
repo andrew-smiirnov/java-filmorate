@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,15 +8,16 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<String, Film> films = new HashMap<>();
+    private final Map<String, Film> films = new ConcurrentHashMap<>();
+
 
     @GetMapping
     public List<Film> getAll() {
@@ -26,7 +26,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
         if (films.containsKey(film.getName())) {
             throw new ValidationException("Фильм с таким названием уже находится в базе.");
         }
@@ -42,7 +42,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film put(@Valid @RequestBody Film film) {
+    public Film put(@Valid @RequestBody Film film) throws ValidationException {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года");
         }

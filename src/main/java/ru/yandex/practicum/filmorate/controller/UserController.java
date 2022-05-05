@@ -1,21 +1,21 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.StringUtils;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, User> users = new ConcurrentHashMap<>();
 
     @GetMapping
     public Collection<User> getAll() {
@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
+    public User create(@Valid @RequestBody User user) throws ValidationException {
         if (users.containsKey(user.getEmail())) {
             throw new ValidationException("Пользователь с электронной почтой " +
                     user.getEmail() + " уже зарегистрирован.");
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     private void setNameUserIfNull(User user) {
-        if (user.getName().isBlank() || user.getName() == null) {
+        if (StringUtils.isBlank(user.getName())){
             user.setName(user.getLogin());
         }
     }
