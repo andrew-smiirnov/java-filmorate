@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-@Profile("inMemoryStorage")
+//@Profile("inMemoryStorage")
 public class InMemoryFilmStorage implements FilmStorage{
     private Long id = 1L;
     private final Map<Long, Film> films = new ConcurrentHashMap<>();
