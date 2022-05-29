@@ -120,13 +120,13 @@ public class FilmControllerTest {
         this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.duration").value("PT1H30M"));
-        film.setDuration(Duration.of(0, ChronoUnit.MINUTES));
+        film.setDuration(0);
         body = mapper.writeValueAsString(film);
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films").content(body)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.duration").value("PT0S"));
-        film.setDuration(Duration.of(-1, ChronoUnit.MINUTES));
+        film.setDuration(-1);
         body = mapper.writeValueAsString(film);
         this.mockMvc.perform(MockMvcRequestBuilders.put("/films").content(body)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -138,9 +138,10 @@ public class FilmControllerTest {
         Film film = new Film();
         film.setName("Name");
         film.setDescription("description");
-        film.setId(1);
+        film.setId(Long.valueOf(1));
         film.setReleaseDate(LocalDate.of(2020, 10, 10));
-        film.setDuration(Duration.of(90, ChronoUnit.MINUTES));
+        film.setDuration(90);
+        //film.setDuration(Duration.of(90, ChronoUnit.MINUTES));
         return film;
     }
 }

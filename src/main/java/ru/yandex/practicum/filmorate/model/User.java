@@ -2,16 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class User {
 
-    private Integer id;
+    private Long id;
     @NotBlank
     @Email(message = "Задан неверный адрес электронной почты")
     private String email;
@@ -21,4 +20,5 @@ public class User {
     private String name;
     @Past(message = "Дата рождения не может быть в будущем.")
     private LocalDate birthday;
+    private Set<Long> friends = new TreeSet<>();
 }
