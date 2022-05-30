@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -42,7 +43,7 @@ public class UserService {
         }
     }
 
-    public Optional<Collection<User>> allFriends(@NotNull Long userId) throws UserNotFoundException {
+    public Collection<User> allFriends(@NotNull Long userId) throws UserNotFoundException {
         if(userStorage.get(userId).isEmpty()) {
             throw new UserNotFoundException(String.format("User с id=%s User с id=%s не найден.", userId));
         }
@@ -53,11 +54,11 @@ public class UserService {
                 friends.add(userStorage.get(id).get());
             }
         }
-        return Optional.of(friends);
+        return friends;
 
     }
 
-    public Optional<Set<User>> commonFriends(@NotNull Long userId, @NotNull Long otherUserId)
+    public Set<User> commonFriends(@NotNull Long userId, @NotNull Long otherUserId)
             throws UserNotFoundException {
         if(userStorage.get(userId).isEmpty() & userStorage.get(otherUserId).isEmpty()){
             throw new UserNotFoundException(String.format("User id=%ds или id=%s User с id=%s не найден.",
@@ -65,13 +66,13 @@ public class UserService {
         }
         if(userStorage.get(userId).get().getFriends().size() == 0
                 || userStorage.get(otherUserId).get().getFriends().size() == 0){
-            return Optional.of(new HashSet<>());
+            return new HashSet<>();
         }
         if(userId <0 || otherUserId <0){
             throw new UserNotFoundException("User id или Friend id <0");
         }
         Set<Long> userFriends = userStorage.get(userId).get().getFriends();
-        return Optional.of(userStorage.get(otherUserId).get().getFriends().stream()
+        return userStorage.get(otherUserId).get().getFriends().stream()
                 .filter(userFriends::contains)
                 .map(id-> {
                     try {
@@ -81,7 +82,27 @@ public class UserService {
                     }
                     return null;
                 })
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet());
 
+    }
+
+    public Collection<User> getAll() {
+        return userStorage.getAll();
+    }
+
+    public Optional<User> get(Long userId) throws UserNotFoundException {
+        return userStorage.get(userId);
+    }
+
+    public User create(User user) throws ValidationException {
+        return userStorage.create(user);
+    }
+
+    public User put(User user) throws ValidationException {
+        return userStorage.put(user);
+    }
+
+    public  void delete(Long userId) throws ValidationException {
+        userStorage.delete(userId);
     }
 }

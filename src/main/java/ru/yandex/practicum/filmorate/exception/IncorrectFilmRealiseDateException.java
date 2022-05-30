@@ -4,14 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class IncorrectFilmRealiseDateException extends RuntimeException {
-    private final String parameter;
-
-    public IncorrectFilmRealiseDateException(String parameter) {
-        this.parameter = parameter;
-    }
-
-    public String getParameter() {
-        return parameter;
+public class IncorrectFilmRealiseDateException extends ValidationException {
+    public IncorrectFilmRealiseDateException(String s) {
+        super(s);
     }
 }

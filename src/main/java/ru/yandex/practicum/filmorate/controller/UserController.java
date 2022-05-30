@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import java.util.Collection;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 
@@ -19,12 +18,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    UserStorage userStorage;
-
     @GetMapping
     public Collection<User> getAll() {
-        return userStorage.getAll();
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
@@ -32,27 +28,27 @@ public class UserController {
         if (id < 0) {
             throw new IncorrectParameterException("User id < 0");
         }
-        return userStorage.get(id).get();
+        return userService.get(id).get();
     }
 
     @GetMapping("/{id}/friends")
     public Collection<User> getAllFriends(@PathVariable Long id) throws UserNotFoundException {
-        return userService.allFriends(id).get();
+        return userService.allFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getAllFriends(@PathVariable Long id, @PathVariable Long otherId) throws UserNotFoundException {
-        return userService.commonFriends(id, otherId).get();
+        return userService.commonFriends(id, otherId);
     }
 
     @PostMapping
     public User create(@RequestBody @Valid User user) throws ValidationException {
-        return userStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User put(@RequestBody @Valid User user) throws ValidationException {
-        return userStorage.put(user);
+        return userService.put(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -62,7 +58,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) throws ValidationException {
-        userStorage.delete(id);
+        userService.delete(id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

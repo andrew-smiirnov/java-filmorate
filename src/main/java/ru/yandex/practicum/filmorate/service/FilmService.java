@@ -15,11 +15,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
+
+
     @Autowired
     FilmStorage filmStorage;
 
     @Autowired
     UserStorage userStorage;
+
+
 
     public void likeFilm(Long id, Long userId) throws ValidationException {
         if(userId < 0 || userStorage.get(userId).isEmpty()){
@@ -48,5 +52,25 @@ public class FilmService {
                 .sorted((o1, o2) -> o2.getLikes().size() - o1.getLikes().size())
                 .limit(Integer.parseInt(count))
                 .collect(Collectors.toSet());
+    }
+
+    public List<Film> getAll(){
+        return filmStorage.getAll();
+    }
+
+    public Optional<Film> get(Long id) throws ValidationException {
+        return filmStorage.get(id);
+    }
+
+    public Film create(Film film) throws ValidationException {
+        return filmStorage.create(film);
+    }
+
+    public Film put(Film film) throws ValidationException {
+        return  filmStorage.put(film);
+    }
+
+    public void delete(Long id) throws FilmNotFoundException {
+        filmStorage.delete(id);
     }
 }

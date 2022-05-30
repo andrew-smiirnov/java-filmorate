@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,18 +20,15 @@ public class FilmController {
     @Autowired
     FilmService filmService;
 
-    @Autowired
-    FilmStorage filmStorage;
-
 
     @GetMapping
     public List<Film> getAll() {
-        return filmStorage.getAll();
+        return filmService.getAll();
     }
 
     @GetMapping("{id}")
     public Film get(@PathVariable Long id) throws ValidationException {
-        return filmStorage.get(id).get();
+        return filmService.get(id).get();
     }
 
     @GetMapping("/popular")
@@ -42,12 +38,12 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody @Valid Film film) throws ValidationException {
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film put(@RequestBody @Valid Film film) throws ValidationException {
-        return filmStorage.put(film);
+        return filmService.put(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -60,7 +56,7 @@ public class FilmController {
 
     @DeleteMapping("{id}")
     public void deleteFilm(@PathVariable Long id) throws ValidationException {
-        filmStorage.delete(id);
+        filmService.delete(id);
         if (id < 0 ){
             throw new IncorrectParameterException("Переданный id < 0");
         }
