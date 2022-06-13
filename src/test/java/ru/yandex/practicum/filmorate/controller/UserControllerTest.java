@@ -157,7 +157,7 @@ public class UserControllerTest {
         User user = new User();
         user.setLogin("login");
         user.setName("Name Surname");
-        user.setId(128500);
+        user.setId(Long.valueOf(128500));
         user.setEmail("email@email.com");
         user.setBirthday(LocalDate.of(1970, 01, 01));
         return user;

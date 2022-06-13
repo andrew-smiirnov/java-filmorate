@@ -1,61 +1,72 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
-@Slf4j
+
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<String, Film> films = new ConcurrentHashMap<>();
+
+    @Autowired
+    FilmService filmService;
 
 
     @GetMapping
     public List<Film> getAll() {
-        List<Film> filmsList = new ArrayList<>(films.values());
-        return filmsList;
+        return filmService.getAll();
+    }
+
+    @GetMapping("{id}")
+    public Film get(@PathVariable Long id) throws ValidationException {
+        return filmService.get(id).get();
+    }
+
+    @GetMapping("/popular")
+    public Set<Film> getPopularFilms(@RequestParam(defaultValue = "10") String count) throws FilmNotFoundException {
+        return filmService.getPopularFilms(count);
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getName())) {
-            throw new ValidationException("Фильм с таким названием уже находится в базе.");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration().isNegative()) {
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
-        log.debug("Добавлен новый фильм: {}", film);
-        films.put(film.getName(), film);
-        return film;
+    public Film create(@RequestBody @Valid Film film) throws ValidationException {
+        return filmService.create(film);
     }
 
     @PutMapping
-    public Film put(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза должна быть не раньше 28 декабря 1895 года");
+    public Film put(@RequestBody @Valid Film film) throws ValidationException {
+        return filmService.put(film);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void likeFilm(@PathVariable Long id, @PathVariable Long userId) throws ValidationException {
+        filmService.likeFilm(id, userId);
+        if (id < 0 || userId < 0){
+            throw new IncorrectParameterException("Переданный id < 0");
         }
-        if (film.getDuration().isNegative()) {
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteFilm(@PathVariable Long id) throws ValidationException {
+        filmService.delete(id);
+        if (id < 0 ){
+            throw new IncorrectParameterException("Переданный id < 0");
         }
-        if (films.containsKey(film.getName())) {
-            log.debug("Обновлена информация о фильме: {}", film);
-            films.replace(film.getName(), film);
-        } else {
-            log.debug("Добавлен новый фильм: {}", film);
-            films.put(film.getName(), film);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLikeFilm(@PathVariable Long id, @PathVariable Long userId) throws ValidationException {
+        filmService.deleteLikeFilm(id, userId);
+        if (id < 0 || userId < 0){
+            throw new IncorrectParameterException("Переданный id < 0");
         }
-        return film;
     }
 }
